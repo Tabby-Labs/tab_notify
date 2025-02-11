@@ -1,25 +1,19 @@
 RegisterNetEvent('notify.sendNotification', function(data)
-    if type(data) ~= 'table' then return end
+    if type(data) ~= 'table' then return end  -- ✅ Fixed condition
 
     local notification = {
         action = 'sendNotification',
-        title = data.title or nil,
         type = data.type or 'default',
-        msg = tostring(data.msg) or 'Placeholder',
-        color = (data.type == 'custom' and data.color) or nil,
-        position = data.position or 'top-right',
-        duration = data.duration or 3000
+        msg = data.msg and tostring(data.msg) or 'Placeholder',  -- ✅ Ensures msg is a string
+        duration = tonumber(data.duration) or 5000,  -- ✅ Ensures duration is a number
     }
-
     SendNUIMessage(notification)
 end)
 
-RegisterCommand('tab_notify', function(args)
-    local arg = args[1]
-
-    if arg == 'normal' then
-        TriggerEvent('notify.sendNotification', { title = 'Notification Title', type = 'success', 'This is normal (success) notification Message', position = 'top-right', duration = '5000'})
-    elseif arg == 'custom' then
-        TriggerEvent('notify.sendNotification', { title = 'Notification Title', type = 'custom', 'This is custom notification Message', color = '#e7dfa9', position = 'center-right', duration = '5000'})
-    end
+RegisterCommand('tab_notify', function()
+    TriggerEvent('notify.sendNotification', {
+        type = 'success',
+        msg = 'This is a normal (success) notification message',
+        duration = 5000,
+    })
 end, false)
