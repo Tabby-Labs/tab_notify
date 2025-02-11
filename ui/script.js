@@ -2,36 +2,43 @@ window.addEventListener('message', function(event) {
     let src = event.data;
 
     if (src.action == "sendNotification") {
-        const container = this.document.getElementById('notificationContainer');
-        // Create new element
-        const notify = this.document.createElement('div');
+        const container = document.getElementById('notificationContainer');
 
-        // notification
-        notify.classList.add('notification'); 
-        if (src.type == "default") {
-            notify.classList.add('default'); 
-        } else if (src.type == "primary") {
-            notify.classList.add('primary');
-        } else if (src.type == "success") {
-            notify.classList.add('success');
-        } else if (src.type == "error") {
-            notify.classList.add('error');
+        // Create new element
+        const notify = document.createElement('div');
+        notify.classList.add('notification', 'fade-in');
+
+        // Set notification background color
+        if (src.type === "custom" && src.color) {
+            notify.style.backgroundColor = src.color;
+        } else {
+            notify.classList.add(src.type || 'default');
         }
-        // Write text
-        notify.textContent = src.msg;
-        notify.classList.add('fade-in');
+
+        // Create title element if provided
+        if (src.title) {
+            const title = document.createElement('strong');
+            title.textContent = src.title;
+            title.classList.add('notification-title');
+            notify.appendChild(title);
+        }
+
+        // Add message
+        const message = document.createElement('p');
+        message.textContent = src.msg;
+        notify.appendChild(message);
 
         // Append to the container
         container.appendChild(notify);
 
-        // timeout
-        this.setTimeout(() => {
+        // Remove notification after duration
+        setTimeout(() => {
             notify.classList.remove('fade-in');
             notify.classList.add('fade-out');
 
-            this.setTimeout(() => {
+            setTimeout(() => {
                 container.removeChild(notify);
             }, 500);
         }, src.duration);
     }
-})
+});
